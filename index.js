@@ -21,7 +21,7 @@ const userSchema = new mongoose.Schema({
   log: [{
     description: String,
     duration: Number,
-    date: Date,
+    date: String,
   }],
 });
 const User = mongoose.model('User', userSchema);
@@ -57,7 +57,8 @@ app.post('/api/users/:id/exercises', (req, res) => {
   const userId = req.params.id;
   let { description, duration, date } = req.body;
   const dateIsProvided = (date !== '');
-  if (!dateIsProvided) date = Date();
+  if (dateIsProvided) date = Date.parse(date).toDateString();
+  if (!dateIsProvided) date = new Date().toDateString();
   const exercise = { description, duration, date };
 
   User.findOne().exec().then((person) => {
