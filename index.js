@@ -18,10 +18,14 @@ mongoose.connection.on('error', (err) => {
 
 const userSchema = new mongoose.Schema({
   username: String,
+  log: [{
+    description: String,
+    duration: Number,
+    date: Date,
+  }],
 });
 const User = mongoose.model('User', userSchema);
 
-const validateUsername = () => (null);
 const selectObjectProperties = (targetObj, fieldsArr) => (
   Object.keys(targetObj).filter((x) => (fieldsArr.includes(x)))
     .reduce((accum, field) => Object.assign(accum, { [field]: targetObj[field] }), {})
@@ -48,6 +52,21 @@ app.get('/api/users', (req, res) =>{
       .map((x) => x.toObject());
     res.json(properResponse);
   });
+});
+app.post('/api/users/:id/exercises', (req, res) => {
+  const userId = req.params.id;
+  let { description, duration, date } = req.body;
+  const dateIsProvided = (date !== '');
+  if (!dateIsProvided) date = Date();
+  const exercise = { description, duration, date };
+
+  User.findOne().exec().then((person) => {
+    person.username = 'step';
+    person.log.push(exercise);
+    person.save();
+    res.json(person);
+  })
+    .catch((err) => res.json(err));
 });
 
 const listener = app.listen(process.env.PORT || 3000, () => {
