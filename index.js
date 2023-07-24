@@ -59,16 +59,13 @@ app.get('/api/users', (req, res) =>{
 app.post('/api/users/:id/exercises', (req, res) => {
   const userId = req.params.id;
   let { description, duration, date } = req.body;
-  console.log(`>${date}<`);
   const dateIsProvided = (date !== '') && !typeof date === undefined;
   if (dateIsProvided) date = new Date(Date.parse(date)).toDateString();
   if (!dateIsProvided) date = new Date().toDateString();
 
   const exercise = { description, duration, date };
-  console.log(exercise);
 
   User.findOne({ _id: new ObjectId(userId) })
-    // .select({ username: 1, _id: 1 })
     .exec()
     .then((person) => {
       person.log.push(exercise);
@@ -78,9 +75,6 @@ app.post('/api/users/:id/exercises', (req, res) => {
       return res.json(Object.assign(response, exercise));
     })
     .catch((err) => res.json(err));
-});
-app.post('/api/test', (req, res) => {
-  res.json(new Date().toDateString());
 });
 
 const listener = app.listen(process.env.PORT || 3000, () => {
