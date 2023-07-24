@@ -4,6 +4,8 @@ const app = express();
 const cors = require('cors');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+
+const { ObjectId } = mongoose.Types;
 require('dotenv').config();
 
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -30,6 +32,7 @@ const selectObjectProperties = (targetObj, fieldsArr) => (
   Object.keys(targetObj).filter((x) => (fieldsArr.includes(x)))
     .reduce((accum, field) => Object.assign(accum, { [field]: targetObj[field] }), {})
 );
+const convertQueryResultToJson = ((queryResult) => (JSON.parse(JSON.stringify(queryResult))));
 
 app.get('/', (req, res) => {
   res.sendFile(`${__dirname}/views/index.html`);
@@ -61,12 +64,16 @@ app.post('/api/users/:id/exercises', (req, res) => {
   if (!dateIsProvided) date = new Date().toDateString();
   const exercise = { description, duration, date };
 
-  User.findOne().exec().then((person) => {
-    person.username = 'step';
-    person.log.push(exercise);
-    person.save();
-    res.json(person);
-  })
+  User.findOne({ _id: new ObjectId(userId) })
+    // .select({ username: 1, _id: 1 })
+    .exec()
+    .then((person) => {
+      person.log.push(exercise);
+      person.save();
+      const response = selectObjectProperties(convertQueryResultToJson(person), ['_id', 'username']);
+
+      return res.json(Object.assign(response, exercise));
+    })
     .catch((err) => res.json(err));
 });
 
