@@ -77,6 +77,29 @@ app.post('/api/users/:id/exercises', (req, res) => {
     .catch((err) => res.json(err));
 });
 
+app.get('/api/users/:id/logs', (req, res) => {
+  const userId = req.params.id;
+  User.findOne({
+    _id: new ObjectId(userId),
+  })
+    .exec()
+    .then(
+      (response) => {
+        const properResponse = selectObjectProperties(
+          convertQueryResultToJson(response),
+          ['_id', 'username', 'log'],
+        );
+        properResponse.log.forEach(
+          (exercise) => (delete exercise._id),
+        );
+        Object.assign(properResponse, { count: properResponse.log.length });
+        console.log(properResponse);
+        res.json(properResponse);
+      },
+    )
+    .catch((err) => console.log(err));
+});
+
 const listener = app.listen(process.env.PORT || 3000, () => {
   console.log(`Your app is listening on port ${listener.address().port}`);
 });
