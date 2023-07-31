@@ -49,7 +49,7 @@ app.post('/api/users', (req, res) => {
     res.json(result);
   }, (err) => console.log(err));
 });
-app.get('/api/users', (req, res) =>{
+app.get('/api/users', (req, res) => {
   User.find({}).exec().then((resArr) => {
     const properResponse = resArr
       .map((x) => x.toObject());
@@ -79,6 +79,14 @@ app.post('/api/users/:id/exercises', (req, res) => {
 
 app.get('/api/users/:id/logs', (req, res) => {
   const userId = req.params.id;
+  const to = req.query.to;
+  const from = req.query.from;
+  const limit = req.query.limit;
+
+  const stringIsDefinedAndNotEmpty = ((x) => (
+    (x !== undefined) && (x !== '')
+  ));
+
   User.findOne({
     _id: new ObjectId(userId),
   })
@@ -92,8 +100,20 @@ app.get('/api/users/:id/logs', (req, res) => {
         properResponse.log.forEach(
           (exercise) => (delete exercise._id),
         );
+        if (stringIsDefinedAndNotEmpty(to)) {
+          properResponse.log = properResponse.log.filter((x) => (
+            !(new Date(Date.parse(x.date)) > new Date(Date.parse(to)))
+          ));
+        }
+        if (stringIsDefinedAndNotEmpty(from)) {
+          properResponse.log = properResponse.log.filter((x) => (
+            !(new Date(Date.parse(x.date)) < new Date(Date.parse(from)))
+          ));
+        }
+        if (stringIsDefinedAndNotEmpty(limit)) {
+          properResponse.log = properResponse.log.slice(0, limit);
+        }
         Object.assign(properResponse, { count: properResponse.log.length });
-        console.log(properResponse);
         res.json(properResponse);
       },
     )
