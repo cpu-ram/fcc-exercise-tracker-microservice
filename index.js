@@ -113,7 +113,9 @@ app.get('/api/users/:id/logs', (req, res) => {
         if (stringIsDefinedAndNotEmpty(limit)) {
           properResponse.log = properResponse.log.slice(0, limit);
         }
-        Object.assign(properResponse, { count: properResponse.log.length });
+        Object.assign(properResponse, {
+          count: properResponse.log.length, to, from, limit,
+        });
         res.json(properResponse);
       },
     )
