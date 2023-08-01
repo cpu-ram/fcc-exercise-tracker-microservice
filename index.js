@@ -79,9 +79,9 @@ app.post('/api/users/:id/exercises', (req, res) => {
 
 app.get('/api/users/:id/logs', (req, res) => {
   const userId = req.params.id;
-  const to = req.query.to;
-  const from = req.query.from;
-  const limit = req.query.limit;
+  const { to } = req.query;
+  const { from } = req.query;
+  const { limit } = req.query;
 
   const stringIsDefinedAndNotEmpty = ((x) => (
     (x !== undefined) && (x !== '')
