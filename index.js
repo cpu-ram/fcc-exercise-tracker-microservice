@@ -114,7 +114,7 @@ app.get('/api/users/:id/logs', (req, res) => {
           properResponse.log = properResponse.log.slice(0, limit);
         }
         Object.assign(properResponse, {
-          count: properResponse.log.length, to, from, limit,
+          count: properResponse.log.length, to, from,
         });
         res.json(properResponse);
       },
