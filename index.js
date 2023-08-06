@@ -62,6 +62,7 @@ app.post('/api/users/:id/exercises', (req, res) => {
   const dateIsProvided = (date !== '') && !(typeof date === 'undefined');
   if (dateIsProvided) date = new Date(Date.parse(date)).toDateString();
   if (!dateIsProvided) date = new Date().toDateString();
+  duration = Number(duration);
 
   const exercise = { description, duration, date };
 
