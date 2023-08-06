@@ -59,7 +59,7 @@ app.get('/api/users', (req, res) => {
 app.post('/api/users/:id/exercises', (req, res) => {
   const userId = req.params.id;
   let { description, duration, date } = req.body;
-  const dateIsProvided = (date !== '') && !typeof date === undefined;
+  const dateIsProvided = (date !== '') && !(typeof date === 'undefined');
   if (dateIsProvided) date = new Date(Date.parse(date)).toDateString();
   if (!dateIsProvided) date = new Date().toDateString();
 
